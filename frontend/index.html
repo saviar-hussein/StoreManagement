@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StoreManager - Categories</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #fff5fb 0%, #fdf2f8 50%, #fce7f3 100%); }
+    .glass { background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.5); }
+    .card-hover { transition: all 0.3s ease; }
+    .card-hover:hover { transform: translateY(-6px); box-shadow: 0 20px 40px rgba(236, 72, 153, 0.15); }
+    .toast { transition: transform .25s ease, opacity .25s ease; }
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-thumb { background: #f9a8d4; border-radius: 999px; }
+  </style>
+</head>
+
+<body class="min-h-screen text-gray-800">
+
+  <!-- Sidebar: this is the left menu with navigation links -->
+  <aside class="fixed left-0 top-0 h-full w-72 glass border-r border-pink-100 z-20">
+    <div class="p-6 border-b border-pink-100 flex items-center gap-3">
+      <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-pink-500 to-fuchsia-500 flex items-center justify-center text-white font-bold text-xl shadow-lg">S</div>
+      <div>
+        <h1 class="text-xl font-extrabold text-gray-900">StoreManager</h1>
+        <p class="text-sm text-pink-500 font-medium">Premium Dashboard</p>
+      </div>
+    </div>
+
+    <nav class="p-4 space-y-2">
+      <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-2xl text-gray-600 hover:bg-pink-50 transition">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7m-9 2v8m0-8H5m7 0h7"/></svg>
+        Dashboard
+      </a>
+      <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-2xl bg-gradient-to-r from-pink-500 to-fuchsia-500 text-white shadow-lg">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V7a2 2 0 00-2-2h-3V3H9v2H6a2 2 0 00-2 2v6m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0H4"/></svg>
+        Categories
+      </a>
+    </nav>
+  </aside>
+
+  <!-- Main Content: this is the main page area where the category list appears -->
+  <main class="ml-72 min-h-screen">
+    <header class="sticky top-0 z-10 glass border-b border-pink-100 px-8 py-5 flex items-center justify-between">
+      <div>
+        <p class="text-sm font-semibold text-pink-500 uppercase tracking-wider">Inventory Management</p>
+        <h2 class="text-3xl font-extrabold text-gray-900">Category Management</h2>
+      </div>
+      <button id="btn-new" class="group bg-gradient-to-r from-pink-500 to-fuchsia-500 text-white px-6 py-3 rounded-2xl font-semibold shadow-lg hover:shadow-pink-300/50 hover:scale-105 transition-all duration-300 flex items-center gap-3">
+        <svg class="w-5 h-5 group-hover:rotate-90 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+        New Category
+      </button>
+    </header>
+
+    <section class="p-8">
+      <!-- Total Count Stat Card -->
+      <div class="max-w-xs mb-8">
+        <div class="glass rounded-3xl p-6 border border-pink-100 flex items-center justify-between">
+          <div>
+            <p class="text-sm text-gray-500 font-medium">Total Categories</p>
+            <p id="total-count" class="text-3xl font-extrabold text-gray-900">0</p>
+          </div>
+          <div class="w-14 h-14 rounded-2xl bg-pink-100 flex items-center justify-center">
+            <svg class="w-7 h-7 text-pink-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V7a2 2 0 00-2-2h-3V3H9v2H6a2 2 0 00-2 2v6m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0H4"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div id="empty-state" class="hidden glass rounded-3xl p-16 text-center border border-pink-100">
+        <div class="w-24 h-24 mx-auto rounded-full bg-pink-100 flex items-center justify-center mb-6">
+          <svg class="w-12 h-12 text-pink-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V7a2 2 0 00-2-2h-3V3H9v2H6a2 2 0 00-2 2v6m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0H4"/></svg>
+        </div>
+        <h3 class="text-2xl font-bold text-gray-900 mb-2">No categories yet</h3>
+        <p class="text-gray-500 mb-6">Create your first category to start organizing products.</p>
+        <button onclick="document.getElementById('btn-new').click()" class="bg-gradient-to-r from-pink-500 to-fuchsia-500 text-white px-6 py-3 rounded-2xl font-semibold shadow-lg hover:scale-105 transition">Create First Category</button>
+      </div>
+
+      <!-- Error State -->
+      <div id="error-state" class="hidden glass rounded-3xl p-12 text-center border border-red-200">
+        <div class="w-20 h-20 mx-auto rounded-full bg-red-100 flex items-center justify-center mb-4">
+          <svg class="w-10 h-10 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12A9 9 0 1112 3a9 9 0 019 9z"/></svg>
+        </div>
+        <h3 class="text-2xl font-bold text-red-600 mb-2">API Connection Failed</h3>
+        <p class="text-gray-600 mb-4">Make sure your Laravel server is running.</p>
+        <code class="bg-gray-100 px-3 py-2 rounded-lg text-sm">php artisan serve</code>
+      </div>
+
+      <!-- Grid Area -->
+      <div id="grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"></div>
+    </section>
+  </main>
+
+  <!-- Modal: this popup form is used to add or edit a category -->
+  <div id="modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="glass rounded-3xl w-full max-w-lg p-8 border border-pink-100 shadow-2xl">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h3 id="modal-title" class="text-2xl font-extrabold text-gray-900">New Category</h3>
+          <p class="text-sm text-pink-500 font-medium">Manage inventory categories</p>
+        </div>
+        <button id="btn-cancel-top" class="w-10 h-10 rounded-xl hover:bg-pink-50 flex items-center justify-center transition">
+          <svg class="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <form id="form" class="space-y-5">
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-2">Category Name</label>
+          <input id="f-name" type="text" required maxlength="255" class="w-full px-4 py-3 rounded-2xl border border-pink-200 bg-white/80 focus:border-pink-500 focus:ring-4 focus:ring-pink-100 outline-none transition" placeholder="e.g. Beverages, Electronics, Dairy">
+          <p id="f-name-error" class="hidden text-sm text-red-500 mt-2"></p>
+        </div>
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-2">Description</label>
+          <textarea id="f-desc" rows="4" maxlength="1000" class="w-full px-4 py-3 rounded-2xl border border-pink-200 bg-white/80 focus:border-pink-500 focus:ring-4 focus:ring-pink-100 outline-none transition resize-none" placeholder="Describe what products belong to this category..."></textarea>
+        </div>
+        <div class="flex gap-3 pt-2">
+          <button type="button" id="btn-cancel" class="flex-1 px-5 py-3 rounded-2xl border border-pink-200 text-gray-700 font-semibold hover:bg-pink-50 transition">Cancel</button>
+          <button type="submit" id="btn-save" class="flex-1 px-5 py-3 rounded-2xl bg-gradient-to-r from-pink-500 to-fuchsia-500 text-white font-semibold shadow-lg hover:shadow-pink-300/50 hover:scale-[1.02] transition-all">Save Category</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast: this small popup shows success or error messages -->
+  <div id="toast" class="toast hidden fixed bottom-6 right-6 z-50 opacity-0 translate-y-2">
+    <div id="toast-inner" class="px-5 py-4 rounded-2xl text-sm font-semibold shadow-2xl"></div>
+  </div>
+
+<script>
+// The API address: this tells the browser where the backend server is.
+const API_BASE = 'http://127.0.0.1:8000/api';
+
+// Find the important parts of the page so JavaScript can change them later.
+const grid = document.getElementById('grid'); // the area where category cards appear
+const emptyState = document.getElementById('empty-state'); // the message shown when there are no categories
+const errorState = document.getElementById('error-state'); // the message shown when the server cannot be reached
+const modal = document.getElementById('modal'); // the popup form window
+const form = document.getElementById('form'); // the form itself
+const fName = document.getElementById('f-name'); // the category name input
+const fNameError = document.getElementById('f-name-error'); // the small error message under the name field
+const fDesc = document.getElementById('f-desc'); // the description textarea
+const modalTitle = document.getElementById('modal-title'); // the title inside the popup
+const connDot = document.getElementById('conn-dot'); // the connection dot
+const connLabel = document.getElementById('conn-label'); // the text showing whether the API is reachable
+const totalCount = document.getElementById('total-count'); // the number showing total categories
+
+// This variable remembers whether we are creating a new category or editing an old one.
+let editingId = null;
+
+// Show a small popup message on the screen.
+function showToast(message, type = 'success') {
+  const toast = document.getElementById('toast'); // the popup container
+  const inner = document.getElementById('toast-inner'); // the inside of the popup
+
+  inner.textContent = message; // put the message text inside the popup
+  inner.className = `px-5 py-4 rounded-2xl text-sm font-semibold shadow-2xl ${type === 'success' ? 'bg-gradient-to-r from-pink-500 to-fuchsia-500 text-white' : 'bg-red-500 text-white'}`; // choose green/pink or red styling
+
+  toast.classList.remove('hidden'); // make the popup visible
+  requestAnimationFrame(() => toast.classList.remove('opacity-0', 'translate-y-2')); // smoothly show it
+
+  clearTimeout(showToast._t); // cancel the old timer so the popup does not disappear too soon
+  showToast._t = setTimeout(() => {
+    toast.classList.add('opacity-0', 'translate-y-2'); // start the fade-out effect
+    setTimeout(() => toast.classList.add('hidden'), 250); // hide it after the animation
+  }, 3000); // show it for 3 seconds
+}
+
+// Open the popup form and fill it with data if we are editing a category.
+function openModal(category = null) {
+  editingId = category ? category.id : null; // save the category ID if editing, otherwise clear it
+  modalTitle.textContent = category ? 'Edit Category' : 'New Category'; // change the title
+  fName.value = category ? category.name : ''; // put the name in the input if editing
+  fDesc.value = category ? (category.description || '') : ''; // put the description in the textarea if editing
+  fNameError.classList.add('hidden'); // hide any old error message
+  modal.classList.remove('hidden'); // show the popup
+  setTimeout(() => fName.focus(), 50); // move the cursor into the name box after a tiny delay
+}
+
+// Close the popup and reset the form.
+function closeModal() {
+  modal.classList.add('hidden'); // hide the popup
+  form.reset(); // clear the form fields
+  editingId = null; // go back to creating a new category
+}
+
+// Make sure text is safe to display so it does not break the page.
+const escapeHtml = str => String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+// Build the HTML for one category card.
+function cardTemplate(cat) {
+  const desc = cat.description ? escapeHtml(cat.description) : '<span class="text-gray-400 italic">No description provided</span>'; // use the description if it exists, otherwise show a fallback message
+  return `
+    <div class="glass rounded-3xl p-6 border border-pink-100 card-hover">
+      <div class="flex items-start justify-between mb-5">
+        <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-pink-100 text-pink-700 text-xs font-bold uppercase tracking-wide">
+          <span class="w-2 h-2 rounded-full bg-pink-500"></span>Category
+        </span>
+        <div class="text-right">
+          <p class="text-xs text-gray-400">ID</p>
+          <p class="text-sm font-bold text-gray-700">#${cat.id}</p>
+        </div>
+      </div>
+      <div class="mb-6">
+        <h3 class="text-2xl font-extrabold text-gray-900 mb-2">${escapeHtml(cat.name)}</h3>
+        <p class="text-gray-600 leading-relaxed">${desc}</p>
+      </div>
+      <div class="pt-5 border-t border-pink-100 flex items-center justify-end">
+        <div class="flex gap-3">
+          <button data-action="edit" data-id="${cat.id}" class="group flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-pink-50 text-pink-600 font-semibold hover:bg-pink-500 hover:text-white transition-all duration-300">
+            <svg class="w-4 h-4 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+            Edit
+          </button>
+          <button data-action="delete" data-id="${cat.id}" class="group flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-red-50 text-red-500 font-semibold hover:bg-red-500 hover:text-white transition-all duration-300">
+            <svg class="w-4 h-4 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22m-5-3l-1-1H7L6 4"/></svg>
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>`;
+}
+
+// Send a request to the server.
+async function apiCall(endpoint, method = 'GET', payload = null) {
+  const options = { method, headers: { 'Accept': 'application/json' } }; // prepare the request settings
+  if (payload) {
+    options.headers['Content-Type'] = 'application/json'; // tell the server we are sending JSON
+    options.body = JSON.stringify(payload); // convert the data into a string the server can read
+  }
+  const res = await fetch(`${API_BASE}${endpoint}`, options); // actually send the request
+  const json = await res.json().catch(() => ({})); // read the response as JSON
+
+  if (!res.ok) {
+    const err = new Error(json.message || 'Request failed'); // create an error message
+    err.fieldErrors = json.errors || null; // save field-specific errors if the server gives them
+    throw err; // stop and show the error
+  }
+  return json; // return the successful response
+}
+
+// Ask the server for all categories.
+async function fetchCategories() {
+  try {
+    const json = await apiCall('/categories'); // call the backend to get categories
+    setConnected(true); // mark the connection as working
+    renderCategories(json.data || []); // show the categories on the page
+  } catch (err) {
+    setConnected(false); // mark the connection as broken
+    grid.innerHTML = ''; // clear the list
+    emptyState.classList.add('hidden'); // hide the empty state
+    errorState.classList.remove('hidden'); // show the error state
+  }
+}
+
+// Show the categories in the page area.
+function renderCategories(categories) {
+  totalCount.textContent = categories.length; // update the total count number
+  const hasData = categories.length > 0; // check whether there are any categories
+  emptyState.classList.toggle('hidden', hasData); // show or hide the empty message
+  errorState.classList.add('hidden'); // hide the error box if it was showing
+  grid.innerHTML = hasData ? categories.map(cardTemplate).join('') : ''; // create cards from the data
+}
+
+// Update the connection status text and color.
+function setConnected(ok) {
+  if (connDot) connDot.className = `w-3 h-3 rounded-full ${ok ? 'bg-emerald-400' : 'bg-red-500'}`; // turn the dot green or red
+  if (connLabel) connLabel.textContent = ok ? 'Connected to Laravel API' : 'API unreachable'; // show the right status text
+}
+
+// Connect the buttons to the correct actions.
+document.getElementById('btn-new').onclick = () => openModal(); // when New Category is clicked, open the form
+ document.getElementById('btn-cancel').onclick = closeModal; // when Cancel is clicked, close the form
+ document.getElementById('btn-cancel-top').onclick = closeModal; // when the top cancel button is clicked, close the form
+ modal.onclick = e => { if (e.target === modal) closeModal(); }; // click outside the form to close it
+
+grid.onclick = async e => {
+  const btn = e.target.closest('button[data-action]'); // find the clicked button inside the card
+  if (!btn) return; // if no button was clicked, stop here
+  const { id, action } = btn.dataset; // read the category ID and action from the button
+
+  if (action === 'edit') {
+    const json = await apiCall(`/categories/${id}`); // load the full category data from the server
+    openModal(json.data); // open the form with that data so it can be edited
+  } else if (action === 'delete') {
+    const name = btn.closest('.glass').querySelector('h3').textContent; // get the category name from the card
+    if (confirm(`Delete "${name}"? This action cannot be undone.`)) {
+      try {
+        await apiCall(`/categories/${id}`, 'DELETE'); // delete the category from the server
+        showToast(`"${name}" deleted successfully`); // show a success message
+        fetchCategories(); // reload the list from the server
+      } catch (err) {
+        showToast(err.message, 'error'); // show an error message if deleting failed
+      }
+    }
+  }
+};
+
+// Run this when the form is submitted.
+form.onsubmit = async e => {
+  e.preventDefault(); // stop the page from refreshing
+  fNameError.classList.add('hidden'); // hide old validation errors
+  const payload = { name: fName.value.trim(), description: fDesc.value.trim() || null }; // collect the form values
+  const btnSave = document.getElementById('btn-save'); // the save button
+
+  btnSave.disabled = true; // stop double-clicks while saving
+  btnSave.textContent = 'Saving...'; // change the button text to show work is happening
+
+  try {
+    if (editingId) {
+      await apiCall(`/categories/${editingId}`, 'PUT', payload); // update an existing category
+      showToast('Category updated successfully'); // show success message
+    } else {
+      await apiCall('/categories', 'POST', payload); // create a new category
+      showToast('Category created successfully'); // show success message
+    }
+    closeModal(); // hide the popup
+    fetchCategories(); // refresh the list
+  } catch (err) {
+    if (err.fieldErrors?.name) {
+      fNameError.textContent = err.fieldErrors.name[0]; // show the exact name error from the server
+      fNameError.classList.remove('hidden'); // make the error visible
+    } else {
+      showToast(err.message, 'error'); // show a general error message
+    }
+  } finally {
+    btnSave.disabled = false; // enable the button again
+    btnSave.textContent = 'Save Category'; // restore the original button text
+  }
+};
+
+// Start everything when the page loads.
+fetchCategories();
+</script>
+</body>
+</html>

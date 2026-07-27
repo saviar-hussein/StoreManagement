@@ -7,7 +7,7 @@ use App\Http\Requests\StoreCategoryRequest;
 use App\Http\Requests\UpdateCategoryRequest;
 use App\Services\CategoryService;
 use Illuminate\Http\JsonResponse;
-
+use Illuminate\Http\Request;
 class CategoryController extends Controller
 {
     protected $categoryService;
@@ -17,12 +17,11 @@ class CategoryController extends Controller
         $this->categoryService = $categoryService;
     }
 
-    /**
-     * GET /api/categories
-     */
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        $categories = $this->categoryService->getAllCategories();
+        $searchQuery = $request->query('search'); //Extracts the 'search' parameter from the URL
+
+        $categories = $this->categoryService->getAllCategories($searchQuery);
 
         return response()->json([
             'success' => true,
@@ -30,9 +29,7 @@ class CategoryController extends Controller
         ], 200);
     }
 
-    /**
-     * GET /api/categories/{id}
-     */
+
     public function show($id): JsonResponse
     {
         $category = $this->categoryService->getCategoryById($id);
@@ -43,9 +40,7 @@ class CategoryController extends Controller
         ], 200);
     }
 
-    /**
-     * POST /api/categories
-     */
+   
     public function store(StoreCategoryRequest $request): JsonResponse
     {
         $category = $this->categoryService->createCategory($request->validated());
@@ -57,9 +52,7 @@ class CategoryController extends Controller
         ], 201);
     }
 
-    /**
-     * PUT /api/categories/{id}
-     */
+  
     public function update(UpdateCategoryRequest $request, $id): JsonResponse
     {
         $category = $this->categoryService->getCategoryById($id);
@@ -72,9 +65,7 @@ class CategoryController extends Controller
         ], 200);
     }
 
-    /**
-     * DELETE /api/categories/{id}
-     */
+   
     public function destroy($id): JsonResponse
     {
         $category = $this->categoryService->getCategoryById($id);

@@ -15,7 +15,7 @@ class StoreCategoryRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255|unique:categories',
-            'description' => 'nullable|string|max:1000',
+            'description' => 'nullable|string|max:500',
         ];
     }
 
@@ -24,6 +24,8 @@ class StoreCategoryRequest extends FormRequest
         return [
             'name.required' => 'Category name is required',
             'name.unique' => 'This category name already exists',
+            'description.max' => 'Description cannot exceed 500 characters',
+            
         ];
     }
 }

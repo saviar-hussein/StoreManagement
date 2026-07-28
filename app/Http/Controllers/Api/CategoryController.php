@@ -17,6 +17,7 @@ class CategoryController extends Controller
         $this->categoryService = $categoryService;
     }
 
+
     public function index(Request $request): JsonResponse
     {
         $searchQuery = $request->query('search'); //Extracts the 'search' parameter from the URL

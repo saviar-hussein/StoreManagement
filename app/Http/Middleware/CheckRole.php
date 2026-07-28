@@ -14,7 +14,7 @@ class CheckRole
      *
      * @param  Closure(Request): (Response)  $next
      */
-    public function handle(Request $request, Closure $next): Response
+public function handle(Request $request, Closure $next, string $role): Response
     {
         //We need a Middleware to stop cashiers from accessing admin routes.
                 // Check if user is logged in and has the correct role

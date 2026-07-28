@@ -189,6 +189,16 @@
       }
     })();
 
+    // Helper: only admins can create/edit/delete categories
+    function isAdmin() {
+      try {
+        const user = JSON.parse(localStorage.getItem('auth_user') || '{}');
+        return user.role === 'admin';
+      } catch (e) {
+        return false;
+      }
+    }
+
     const API_BASE = 'http://127.0.0.1:8000/api';
 
     const grid = document.getElementById('grid');
@@ -388,7 +398,13 @@
       });
     }
 
-    document.getElementById('btn-new').onclick = () => openModal();
+    document.getElementById('btn-new').onclick = () => {
+      if (!isAdmin()) {
+        showToast('Not available yet', 'error');
+        return;
+      }
+      openModal();
+    };
     document.getElementById('btn-cancel').onclick = closeModal;
     document.getElementById('btn-cancel-top').onclick = closeModal;
     modal.onclick = e => { if (e.target === modal) closeModal(); };
@@ -397,6 +413,11 @@
       const btn = e.target.closest('button[data-action]');
       if (!btn) return;
       const { id, action } = btn.dataset;
+
+      if (!isAdmin()) {
+        showToast('Not available yet', 'error');
+        return;
+      }
 
       if (action === 'edit') {
         try {

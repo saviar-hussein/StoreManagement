@@ -1,9 +1,18 @@
 // components/sidebar.js
+// Small web component that renders the left-hand navigation/sidebar.
+// Keeping the sidebar as a component keeps the main HTML file focused on page
+// content and makes the navigation easier to reuse across pages.
 class AppSidebar extends HTMLElement {
   connectedCallback() {
+    // Ensure the host element behaves like a block-level container
+    this.style.display = 'block';
+
+    // Render the sidebar HTML. Styling uses utility classes (Tailwind)
+    // and the project's `glass` style for a frosted look.
     this.innerHTML = `
-      <aside class="fixed left-0 top-0 h-full w-72 glass border-r border-pink-100 z-20">
+      <aside class="fixed left-0 top-0 h-full w-72 glass border-r border-pink-100 z-20 bg-white/80 backdrop-blur-md">
         <div class="p-6 border-b border-pink-100 flex items-center gap-3">
+          <!-- Brand/logo area -->
           <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-pink-500 to-fuchsia-500 flex items-center justify-center text-white font-bold text-xl shadow-lg">S</div>
           <div>
             <h1 class="text-xl font-extrabold text-gray-900">StoreManager</h1>
@@ -11,14 +20,15 @@ class AppSidebar extends HTMLElement {
           </div>
         </div>
 
+        <!-- Navigation links: simple and intentionally minimal for this demo -->
         <nav class="p-4 space-y-2">
-          <!-- Dashboard button (points to index.html or disabled) -->
+          <!-- Standard link to the dashboard (non-highlighted) -->
           <a href="./index.html" class="flex items-center gap-3 px-4 py-3 rounded-2xl text-gray-600 hover:bg-pink-50 transition">
             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7m-9 2v8m0-8H5m7 0h7"/></svg>
             Dashboard
           </a>
 
-          <!-- Categories button points directly to index.html -->
+          <!-- Active link to the categories view. Highlighted with a gradient background. -->
           <a href="./index.html" class="flex items-center gap-3 px-4 py-3 rounded-2xl bg-gradient-to-r from-pink-500 to-fuchsia-500 text-white shadow-lg">
             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V7a2 2 0 00-2-2h-3V3H9v2H6a2 2 0 00-2 2v6m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0H4"/></svg>
             Categories
@@ -29,4 +39,5 @@ class AppSidebar extends HTMLElement {
   }
 }
 
+// Register the custom element so it can be used as <app-sidebar></app-sidebar>
 customElements.define('app-sidebar', AppSidebar);

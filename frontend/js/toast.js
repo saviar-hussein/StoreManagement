@@ -1,8 +1,11 @@
 // js/toast.js
+// Small helper to show transient toast notifications. Designed to be
+// safe to call from any page — it will auto-create the container if needed.
 export function showToast(message, type = 'success') {
   let toast = document.getElementById('toast');
 
-  // Auto-create toast HTML if missing on the current page
+  // If the host page doesn't include the toast container, create it so
+  // callers don't need to worry about bootstrapping markup.
   if (!toast) {
     toast = document.createElement('div');
     toast.id = 'toast';
@@ -17,9 +20,11 @@ export function showToast(message, type = 'success') {
     type === 'success' ? 'bg-gradient-to-r from-pink-500 to-fuchsia-500 text-white' : 'bg-red-500 text-white'
   }`;
 
+  // Animate toast in
   toast.classList.remove('hidden');
   requestAnimationFrame(() => toast.classList.remove('opacity-0', 'translate-y-2'));
 
+  // Clear any previous hide timer and schedule hiding after 3s
   clearTimeout(showToast._t);
   showToast._t = setTimeout(() => {
     toast.classList.add('opacity-0', 'translate-y-2');

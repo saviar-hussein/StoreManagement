@@ -3,99 +3,122 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
   <title>StoreManager - Categories</title>
-  
+
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  
-  <!-- Custom External Stylesheet -->
+
+  <!-- Project stylesheet -->
   <link rel="stylesheet" href="./css/style.css" />
+
+  <!-- Sidebar web component -->
+  <script src="./components/sidebar.js"></script> 
 </head>
 
-<body class="min-h-screen text-gray-800 flex">
+<body class="min-h-screen text-gray-800 flex flex-col md:flex-row overflow-x-hidden">
 
-  <!-- SIDEBAR (Direct HTML so it never breaks!) -->
-  <aside class="fixed left-0 top-0 h-full w-72 glass border-r border-pink-100 z-20">
-    <div class="p-6 border-b border-pink-100 flex items-center gap-3">
-      <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-pink-500 to-fuchsia-500 flex items-center justify-center text-white font-bold text-xl shadow-lg">S</div>
-      <div>
-        <h1 class="text-xl font-extrabold text-gray-900">StoreManager</h1>
-        <p class="text-sm text-pink-500 font-medium">Premium Dashboard</p>
+  <!-- Left navigation: fixed on desktop, expandable on mobile -->
+  <app-sidebar id="sidebar-container" class="w-full md:w-64 lg:w-72 flex-shrink-0 transition-all duration-300"></app-sidebar>
+
+  <!-- Main content area -->
+  <main class="flex-1 min-w-0 min-h-screen">
+    <!-- Header with mobile menu toggle -->
+    <header class="sticky top-0 z-10 glass border-b border-pink-100 px-4 sm:px-8 py-4 sm:py-5 flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <!-- Mobile Sidebar Toggle Button -->
+        <button id="btn-toggle-sidebar" class="md:hidden p-2 rounded-xl bg-pink-50 text-pink-600 hover:bg-pink-100 transition">
+          <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+        <div>
+          <p class="text-xs sm:text-sm font-semibold text-pink-500 uppercase tracking-wider">Inventory Management</p>
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-gray-900">Category Management</h2>
+        </div>
       </div>
-    </div>
 
-    <nav class="p-4 space-y-2">
-      <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-2xl text-gray-600 hover:bg-pink-50 transition">
-        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7m-9 2v8m0-8H5m7 0h7"/></svg>
-        Dashboard
-      </a>
-      <a href="index.html" class="flex items-center gap-3 px-4 py-3 rounded-2xl bg-gradient-to-r from-pink-500 to-fuchsia-500 text-white shadow-lg">
-        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V7a2 2 0 00-2-2h-3V3H9v2H6a2 2 0 00-2 2v6m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0H4"/></svg>
-        Categories
-      </a>
-    </nav>
-  </aside>
-
-  <!-- MAIN CONTENT -->
-  <main class="ml-72 w-full min-h-screen">
-    <header class="sticky top-0 z-10 glass border-b border-pink-100 px-8 py-5 flex items-center justify-between">
-      <div>
-        <p class="text-sm font-semibold text-pink-500 uppercase tracking-wider">Inventory Management</p>
-        <h2 class="text-3xl font-extrabold text-gray-900">Category Management</h2>
-      </div>
-      <button id="btn-new" class="group bg-gradient-to-r from-pink-500 to-fuchsia-500 text-white px-6 py-3 rounded-2xl font-semibold shadow-lg hover:shadow-pink-300/50 hover:scale-105 transition-all duration-300 flex items-center gap-3">
+      <button id="btn-new" class="w-full sm:w-auto group bg-gradient-to-r from-pink-500 to-fuchsia-500 text-white px-5 sm:px-6 py-2.5 sm:py-3 rounded-2xl font-semibold shadow-lg hover:shadow-pink-300/50 hover:scale-[1.02] transition-all duration-300 flex items-center justify-center gap-3">
         <svg class="w-5 h-5 group-hover:rotate-90 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
         New Category
       </button>
     </header>
 
-    <section class="p-8">
-      <!-- Total Count Stat Card -->
-      <div class="max-w-xs mb-8">
-        <div class="glass rounded-3xl p-6 border border-pink-100 flex items-center justify-between">
-          <div>
-            <p class="text-sm text-gray-500 font-medium">Total Categories</p>
-            <p id="total-count" class="text-3xl font-extrabold text-gray-900">0</p>
-          </div>
-          <div class="w-14 h-14 rounded-2xl bg-pink-100 flex items-center justify-center">
-            <svg class="w-7 h-7 text-pink-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V7a2 2 0 00-2-2h-3V3H9v2H6a2 2 0 00-2 2v6m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0H4"/></svg>
+    <section class="p-4 sm:p-8">
+      <!-- Stats, Search & Layout Toggle Row -->
+      <div class="flex flex-col lg:flex-row items-stretch lg:items-center justify-between mb-6 sm:mb-8 gap-4">
+        
+        <!-- Total Categories Stat Card -->
+        <div class="w-full lg:w-auto lg:min-w-[240px]">
+          <div class="glass rounded-3xl p-5 sm:p-6 border border-pink-100 flex items-center justify-between">
+            <div>
+              <p class="text-sm text-gray-500 font-medium">Total Categories</p>
+              <p id="total-count" class="text-2xl sm:text-3xl font-extrabold text-gray-900">0</p>
+            </div>
+            <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-pink-100 flex items-center justify-center">
+              <svg class="w-6 h-6 sm:w-7 sm:h-7 text-pink-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V7a2 2 0 00-2-2h-3V3H9v2H6a2 2 0 00-2 2v6m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0H4"/></svg>
+            </div>
           </div>
         </div>
+
+        <!-- Right Controls: Search Input & View Switcher -->
+        <div class="flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto">
+          <!-- Backend Search Bar -->
+          <div class="relative w-full sm:w-72">
+            <input 
+              id="search-input" 
+              type="text" 
+              placeholder="Search categories..." 
+              class="w-full pl-11 pr-4 py-3 rounded-2xl glass border border-pink-100 bg-white/80 focus:border-pink-500 focus:ring-4 focus:ring-pink-100 outline-none text-sm transition shadow-sm"
+            >
+            <svg class="w-5 h-5 text-pink-400 absolute left-4 top-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+          </div>
+
+          <!-- View Switcher (Card vs Stack) -->
+          <div class="flex items-center justify-center gap-2 glass p-1.5 rounded-2xl border border-pink-100 w-full sm:w-auto">
+            <button id="btn-view-card" onclick="switchView('card')" class="flex-1 sm:flex-none px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 bg-pink-500 text-white shadow-md">
+              Card
+            </button>
+            <button id="btn-view-stack" onclick="switchView('stack')" class="flex-1 sm:flex-none px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 text-gray-600 hover:text-gray-900 hover:bg-pink-50">
+              Stack
+            </button>
+          </div>
+        </div>
+
       </div>
 
-      <!-- Empty State -->
-      <div id="empty-state" class="hidden glass rounded-3xl p-16 text-center border border-pink-100">
-        <div class="w-24 h-24 mx-auto rounded-full bg-pink-100 flex items-center justify-center mb-6">
-          <svg class="w-12 h-12 text-pink-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V7a2 2 0 00-2-2h-3V3H9v2H6a2 2 0 00-2 2v6m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0H4"/></svg>
+      <!-- Empty state UI -->
+      <div id="empty-state" class="hidden glass rounded-3xl p-8 sm:p-16 text-center border border-pink-100">
+        <div class="w-20 h-20 sm:w-24 sm:h-24 mx-auto rounded-full bg-pink-100 flex items-center justify-center mb-6">
+          <svg class="w-10 h-10 sm:w-12 sm:h-12 text-pink-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V7a2 2 0 00-2-2h-3V3H9v2H6a2 2 0 00-2 2v6m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0H4"/></svg>
         </div>
-        <h3 class="text-2xl font-bold text-gray-900 mb-2">No categories yet</h3>
-        <p class="text-gray-500 mb-6">Create your first category to start organizing products.</p>
+        <h3 class="text-xl sm:text-2xl font-bold text-gray-900 mb-2">No categories found</h3>
+        <p class="text-gray-500 mb-6 text-sm sm:text-base">Try adjusting your search or create a new category.</p>
         <button onclick="document.getElementById('btn-new').click()" class="bg-gradient-to-r from-pink-500 to-fuchsia-500 text-white px-6 py-3 rounded-2xl font-semibold shadow-lg hover:scale-105 transition">Create First Category</button>
       </div>
 
-      <!-- Error State -->
-      <div id="error-state" class="hidden glass rounded-3xl p-12 text-center border border-red-200">
-        <div class="w-20 h-20 mx-auto rounded-full bg-red-100 flex items-center justify-center mb-4">
-          <svg class="w-10 h-10 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12A9 9 0 1112 3a9 9 0 019 9z"/></svg>
+      <!-- Error state UI -->
+      <div id="error-state" class="hidden glass rounded-3xl p-8 sm:p-12 text-center border border-red-200">
+        <div class="w-16 h-16 sm:w-20 sm:h-20 mx-auto rounded-full bg-red-100 flex items-center justify-center mb-4">
+          <svg class="w-8 h-8 sm:w-10 sm:h-10 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12A9 9 0 1112 3a9 9 0 019 9z"/></svg>
         </div>
-        <h3 class="text-2xl font-bold text-red-600 mb-2">API Connection Failed</h3>
-        <p class="text-gray-600 mb-4">Make sure your Laravel server is running.</p>
+        <h3 class="text-xl sm:text-2xl font-bold text-red-600 mb-2">API Connection Failed</h3>
+        <p class="text-gray-600 mb-4 text-sm sm:text-base">Make sure your Laravel server is running.</p>
         <code class="bg-gray-100 px-3 py-2 rounded-lg text-sm">php artisan serve</code>
       </div>
 
-      <!-- Grid Area -->
-      <div id="grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"></div>
+      <!-- Category Views -->
+      <div id="grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6"></div>
+      <div id="stack-list" class="hidden glass rounded-3xl border border-pink-100 overflow-hidden divide-y divide-pink-100"></div>
     </section>
   </main>
 
-  <!-- Modal Form -->
+  <!-- Modal form -->
   <div id="modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="glass rounded-3xl w-full max-w-lg p-8 border border-pink-100 shadow-2xl">
+    <div class="glass rounded-3xl w-full max-w-lg p-6 sm:p-8 border border-pink-100 shadow-2xl max-h-[90vh] overflow-y-auto">
       <div class="flex items-center justify-between mb-6">
         <div>
-          <h3 id="modal-title" class="text-2xl font-extrabold text-gray-900">New Category</h3>
-          <p class="text-sm text-pink-500 font-medium">Manage inventory categories</p>
+          <h3 id="modal-title" class="text-xl sm:text-2xl font-extrabold text-gray-900">New Category</h3>
+          <p class="text-xs sm:text-sm text-pink-500 font-medium">Manage inventory categories</p>
         </div>
         <button id="btn-cancel-top" class="w-10 h-10 rounded-xl hover:bg-pink-50 flex items-center justify-center transition">
           <svg class="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
@@ -112,7 +135,7 @@
           <label class="block text-sm font-semibold text-gray-700 mb-2">Description</label>
           <textarea id="f-desc" rows="4" maxlength="1000" class="w-full px-4 py-3 rounded-2xl border border-pink-200 bg-white/80 focus:border-pink-500 focus:ring-4 focus:ring-pink-100 outline-none transition resize-none" placeholder="Describe what products belong to this category..."></textarea>
         </div>
-        <div class="flex gap-3 pt-2">
+        <div class="flex flex-col sm:flex-row gap-3 pt-2">
           <button type="button" id="btn-cancel" class="flex-1 px-5 py-3 rounded-2xl border border-pink-200 text-gray-700 font-semibold hover:bg-pink-50 transition">Cancel</button>
           <button type="submit" id="btn-save" class="flex-1 px-5 py-3 rounded-2xl bg-gradient-to-r from-pink-500 to-fuchsia-500 text-white font-semibold shadow-lg hover:shadow-pink-300/50 hover:scale-[1.02] transition-all">Save Category</button>
         </div>
@@ -129,6 +152,7 @@
     const API_BASE = 'http://127.0.0.1:8000/api';
 
     const grid = document.getElementById('grid');
+    const stackList = document.getElementById('stack-list');
     const emptyState = document.getElementById('empty-state');
     const errorState = document.getElementById('error-state');
     const modal = document.getElementById('modal');
@@ -138,8 +162,39 @@
     const fDesc = document.getElementById('f-desc');
     const modalTitle = document.getElementById('modal-title');
     const totalCount = document.getElementById('total-count');
+    const sidebarContainer = document.getElementById('sidebar-container');
+    const toggleSidebarBtn = document.getElementById('btn-toggle-sidebar');
+    const searchInput = document.getElementById('search-input');
 
     let editingId = null;
+    let searchTimeout = null;
+
+    // Toggle sidebar on mobile screen size
+    if (toggleSidebarBtn) {
+      toggleSidebarBtn.onclick = () => {
+        sidebarContainer.classList.toggle('hidden');
+      };
+    }
+
+    function switchView(mode) {
+      const btnCard = document.getElementById('btn-view-card');
+      const btnStack = document.getElementById('btn-view-stack');
+
+      const activeClass = "flex-1 sm:flex-none px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 bg-pink-500 text-white shadow-md";
+      const inactiveClass = "flex-1 sm:flex-none px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 text-gray-600 hover:text-gray-900 hover:bg-pink-50";
+
+      if (mode === 'card') {
+        grid.classList.remove('hidden');
+        stackList.classList.add('hidden');
+        btnCard.className = activeClass;
+        btnStack.className = inactiveClass;
+      } else {
+        grid.classList.add('hidden');
+        stackList.classList.remove('hidden');
+        btnStack.className = activeClass;
+        btnCard.className = inactiveClass;
+      }
+    }
 
     function escapeHtml(str) {
       return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -199,27 +254,18 @@
     function cardTemplate(cat) {
       const desc = cat.description ? escapeHtml(cat.description) : '<span class="text-gray-400 italic">No description provided</span>';
       return `
-        <div class="glass rounded-3xl p-6 border border-pink-100 card-hover">
-          <div class="flex items-start justify-between mb-5">
-            <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-pink-100 text-pink-700 text-xs font-bold uppercase tracking-wide">
-              <span class="w-2 h-2 rounded-full bg-pink-500"></span>Category
-            </span>
-            <div class="text-right">
-              <p class="text-xs text-gray-400">ID</p>
-              <p class="text-sm font-bold text-gray-700">#${cat.id}</p>
-            </div>
+        <div class="glass rounded-3xl p-5 sm:p-6 border border-pink-100 card-hover overflow-hidden flex flex-col justify-between">
+          <div class="mb-6 overflow-hidden">
+            <h3 class="text-xl sm:text-2xl font-extrabold text-gray-900 mb-2 break-words max-w-full">${escapeHtml(cat.name)}</h3>
+            <p class="text-gray-600 text-sm sm:text-base leading-relaxed break-words max-w-full">${desc}</p>
           </div>
-          <div class="mb-6">
-            <h3 class="text-2xl font-extrabold text-gray-900 mb-2">${escapeHtml(cat.name)}</h3>
-            <p class="text-gray-600 leading-relaxed">${desc}</p>
-          </div>
-          <div class="pt-5 border-t border-pink-100 flex items-center justify-end">
-            <div class="flex gap-3">
-              <button data-action="edit" data-id="${cat.id}" class="group flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-pink-50 text-pink-600 font-semibold hover:bg-pink-500 hover:text-white transition-all duration-300">
+          <div class="pt-4 border-t border-pink-100 flex items-center justify-end">
+            <div class="flex gap-2 sm:gap-3">
+              <button data-action="edit" data-id="${cat.id}" class="group flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-2xl bg-pink-50 text-pink-600 text-xs sm:text-sm font-semibold hover:bg-pink-500 hover:text-white transition-all duration-300">
                 <svg class="w-4 h-4 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                 Edit
               </button>
-              <button data-action="delete" data-id="${cat.id}" class="group flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-red-50 text-red-500 font-semibold hover:bg-red-500 hover:text-white transition-all duration-300">
+              <button data-action="delete" data-id="${cat.id}" class="group flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-2xl bg-red-50 text-red-500 text-xs sm:text-sm font-semibold hover:bg-red-500 hover:text-white transition-all duration-300">
                 <svg class="w-4 h-4 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22m-5-3l-1-1H7L6 4"/></svg>
                 Delete
               </button>
@@ -228,12 +274,36 @@
         </div>`;
     }
 
-    async function fetchCategories() {
+    function stackTemplate(cat) {
+      const desc = cat.description ? escapeHtml(cat.description) : '<span class="text-gray-400 italic">No description provided</span>';
+      return `
+        <div class="p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-pink-50/40 transition-colors">
+          <div class="flex-1 min-w-0 pr-0 sm:pr-4">
+            <h3 class="text-lg sm:text-xl font-bold text-gray-900 break-words mb-1">${escapeHtml(cat.name)}</h3>
+            <p class="text-gray-600 text-sm break-words">${desc}</p>
+          </div>
+          <div class="flex items-center gap-2 sm:gap-3 shrink-0 self-end sm:self-auto">
+            <button data-action="edit" data-id="${cat.id}" class="group flex items-center gap-1.5 px-3 sm:px-4 py-2 rounded-2xl bg-pink-50 text-pink-600 font-semibold hover:bg-pink-500 hover:text-white transition-all duration-300 text-xs sm:text-sm">
+              <svg class="w-4 h-4 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+              Edit
+            </button>
+            <button data-action="delete" data-id="${cat.id}" class="group flex items-center gap-1.5 px-3 sm:px-4 py-2 rounded-2xl bg-red-50 text-red-500 font-semibold hover:bg-red-500 hover:text-white transition-all duration-300 text-xs sm:text-sm">
+              <svg class="w-4 h-4 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22m-5-3l-1-1H7L6 4"/></svg>
+              Delete
+            </button>
+          </div>
+        </div>`;
+    }
+
+    // Fetch categories with optional backend search query parameter
+    async function fetchCategories(query = '') {
       try {
-        const json = await apiCall('/categories');
+        const endpoint = query ? `/categories?search=${encodeURIComponent(query)}` : '/categories';
+        const json = await apiCall(endpoint);
         renderCategories(json.data || []);
       } catch (err) {
         grid.innerHTML = '';
+        stackList.innerHTML = '';
         emptyState.classList.add('hidden');
         errorState.classList.remove('hidden');
       }
@@ -242,9 +312,23 @@
     function renderCategories(categories) {
       totalCount.textContent = categories.length;
       const hasData = categories.length > 0;
+      
       emptyState.classList.toggle('hidden', hasData);
       errorState.classList.add('hidden');
+      
       grid.innerHTML = hasData ? categories.map(cardTemplate).join('') : '';
+      stackList.innerHTML = hasData ? categories.map(stackTemplate).join('') : '';
+    }
+
+    // Handle typing in the search bar with a 300ms debounce
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => {
+        clearTimeout(searchTimeout);
+        const query = e.target.value.trim();
+        searchTimeout = setTimeout(() => {
+          fetchCategories(query);
+        }, 300);
+      });
     }
 
     document.getElementById('btn-new').onclick = () => openModal();
@@ -252,27 +336,33 @@
     document.getElementById('btn-cancel-top').onclick = closeModal;
     modal.onclick = e => { if (e.target === modal) closeModal(); };
 
-    grid.onclick = async e => {
+    document.addEventListener('click', async e => {
       const btn = e.target.closest('button[data-action]');
       if (!btn) return;
       const { id, action } = btn.dataset;
 
       if (action === 'edit') {
-        const json = await apiCall(`/categories/${id}`);
-        openModal(json.data);
+        try {
+          const json = await apiCall(`/categories/${id}`);
+          openModal(json.data);
+        } catch (err) {
+          showToast(err.message, 'error');
+        }
       } else if (action === 'delete') {
-        const name = btn.closest('.glass').querySelector('h3').textContent;
+        const rowOrCard = btn.closest('.glass, .hover\\:bg-pink-50\\/40');
+        const name = rowOrCard ? rowOrCard.querySelector('h3').textContent : 'this category';
+        
         if (confirm(`Delete "${name}"? This action cannot be undone.`)) {
           try {
             await apiCall(`/categories/${id}`, 'DELETE');
             showToast(`"${name}" deleted successfully`);
-            fetchCategories();
+            fetchCategories(searchInput?.value.trim() || '');
           } catch (err) {
             showToast(err.message, 'error');
           }
         }
       }
-    };
+    });
 
     form.onsubmit = async e => {
       e.preventDefault();
@@ -292,7 +382,7 @@
           showToast('Category created successfully');
         }
         closeModal();
-        fetchCategories();
+        fetchCategories(searchInput?.value.trim() || '');
       } catch (err) {
         if (err.fieldErrors?.name) {
           fNameError.textContent = err.fieldErrors.name[0];
@@ -306,7 +396,7 @@
       }
     };
 
-    fetchCategories();
+    fetchCategories(); 
   </script>
 </body>
 </html>

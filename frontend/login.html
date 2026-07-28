@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StoreManager - Login</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="./css/style.css" />
+</head>
+
+<body class="min-h-screen bg-gradient-to-br from-pink-50 via-white to-fuchsia-50 text-gray-800 flex items-center justify-center p-4">
+
+  <!-- Glassmorphic Login Card -->
+  <div class="w-full max-w-md glass rounded-3xl p-8 sm:p-10 border border-pink-100 shadow-2xl relative overflow-hidden">
+    
+    <!-- Header -->
+    <div class="text-center mb-8">
+      <div class="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-tr from-pink-500 to-fuchsia-500 text-white flex items-center justify-center shadow-lg shadow-pink-300/50 mb-4">
+        <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 11h14a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2z"/>
+        </svg>
+      </div>
+      <h1 class="text-2xl sm:text-3xl font-extrabold text-gray-900">Welcome Back</h1>
+      <p class="text-sm text-pink-500 font-medium mt-1">Sign in to your StoreManager account</p>
+    </div>
+
+    <!-- Login Form -->
+    <form id="login-form" class="space-y-5" novalidate>
+      
+      <!-- Email Input Field -->
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-2">Email Address</label>
+        <div class="relative">
+          <input 
+            id="email" 
+            type="email" 
+            placeholder="admin@store.com" 
+            class="w-full pl-11 pr-4 py-3 rounded-2xl border border-pink-200 bg-white/80 focus:border-pink-500 focus:ring-4 focus:ring-pink-100 outline-none transition"
+            required
+          />
+          <span class="absolute left-4 top-3.5 text-pink-400 font-bold select-none">@</span>
+        </div>
+        
+        <!-- Live Validation Error -->
+        <p id="email-error" class="hidden text-xs text-red-500 font-medium mt-1.5 flex items-center gap-1">
+          <span>⚠️ Please enter a valid email address (e.g. prefix@domain.com)</span>
+        </p>
+      </div>
+
+      <!-- Password Input Field -->
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-2">Password</label>
+        <div class="relative">
+          <input 
+            id="password" 
+            type="password" 
+            placeholder="••••••••" 
+            class="w-full pl-11 pr-11 py-3 rounded-2xl border border-pink-200 bg-white/80 focus:border-pink-500 focus:ring-4 focus:ring-pink-100 outline-none transition"
+            required
+          />
+          <!-- Lock Icon (Left) -->
+          <svg class="w-5 h-5 text-pink-400 absolute left-4 top-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+          </svg>
+
+          <!-- Toggle Password Eye Button (Right) -->
+          <button 
+            type="button" 
+            id="toggle-password" 
+            class="absolute right-4 top-3.5 text-pink-400 hover:text-pink-600 focus:outline-none transition"
+            aria-label="Toggle password visibility"
+          >
+            <!-- Eye Open Icon -->
+            <svg id="eye-icon" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+            </svg>
+
+            <!-- Eye Off / Slash Icon (Hidden by default) -->
+            <svg id="eye-off-icon" class="w-5 h-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858-5.908a10.02 10.02 0 013.982-.822c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m-1.748 1.748a3 3 0 11-4.243-4.243" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3l18 18" />
+            </svg>
+          </button>
+        </div>
+        <p id="password-error" class="hidden text-xs text-red-500 font-medium mt-1.5 flex items-center gap-1">
+          <span>⚠️ Password is required</span>
+        </p>
+      </div>
+
+      <!-- General Server Error Message -->
+      <div id="general-error" class="hidden p-3 rounded-xl bg-red-50 border border-red-200 text-xs text-red-600 font-semibold text-center"></div>
+
+      <!-- Submit Button -->
+      <button 
+        type="submit" 
+        id="btn-login" 
+        class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-pink-500 to-fuchsia-500 text-white font-semibold shadow-lg hover:shadow-pink-300/50 hover:scale-[1.01] active:scale-[0.99] transition-all duration-200 mt-2"
+      >
+        Sign In
+      </button>
+
+    </form>
+  </div>
+
+  <script>
+    const API_BASE = 'http://127.0.0.1:8000/api';
+
+    // Password Toggle Feature
+    const passwordInput = document.getElementById('password');
+    const togglePasswordBtn = document.getElementById('toggle-password');
+    const eyeIcon = document.getElementById('eye-icon');
+    const eyeOffIcon = document.getElementById('eye-off-icon');
+
+    togglePasswordBtn.addEventListener('click', () => {
+      const isPassword = passwordInput.type === 'password';
+      passwordInput.type = isPassword ? 'text' : 'password';
+      eyeIcon.classList.toggle('hidden', isPassword);
+      eyeOffIcon.classList.toggle('hidden', !isPassword);
+    });
+
+    // If user is already logged in, send them to the right page for their role
+    if (localStorage.getItem('auth_token')) {
+      try {
+        const existingUser = JSON.parse(localStorage.getItem('auth_user') || '{}');
+        window.location.href = existingUser.role === 'admin' ? 'index.html' : 'cashier.html';
+      } catch (e) {
+        window.location.href = 'cashier.html';
+      }
+    }
+
+    const loginForm = document.getElementById('login-form');
+    const emailInput = document.getElementById('email');
+    const emailError = document.getElementById('email-error');
+    const passwordError = document.getElementById('password-error');
+    const generalError = document.getElementById('general-error');
+    const btnLogin = document.getElementById('btn-login');
+
+    // Strict Email Regex: requires characters before @, domain name, and TLD suffix
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    // Validate Email Field
+    function validateEmail() {
+      const value = emailInput.value.trim();
+
+      if (!emailRegex.test(value)) {
+        emailError.classList.remove('hidden');
+        emailInput.classList.add('border-red-500', 'focus:ring-red-100');
+        emailInput.classList.remove('border-pink-200', 'focus:ring-pink-100');
+        return false;
+      } else {
+        emailError.classList.add('hidden');
+        emailInput.classList.remove('border-red-500', 'focus:ring-red-100');
+        emailInput.classList.add('border-pink-200', 'focus:ring-pink-100');
+        return true;
+      }
+    }
+
+    // Validate Password Field
+    function validatePassword() {
+      if (!passwordInput.value.trim()) {
+        passwordError.classList.remove('hidden');
+        passwordInput.classList.add('border-red-500', 'focus:ring-red-100');
+        passwordInput.classList.remove('border-pink-200', 'focus:ring-pink-100');
+        return false;
+      } else {
+        passwordError.classList.add('hidden');
+        passwordInput.classList.remove('border-red-500', 'focus:ring-red-100');
+        passwordInput.classList.add('border-pink-200', 'focus:ring-pink-100');
+        return true;
+      }
+    }
+
+    // Live Validation Events
+    emailInput.addEventListener('input', validateEmail);
+    passwordInput.addEventListener('input', validatePassword);
+
+    // Form Submit Handler
+    loginForm.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      generalError.classList.add('hidden');
+
+      const isEmailValid = validateEmail();
+      const isPasswordValid = validatePassword();
+
+      if (!isEmailValid || !isPasswordValid) {
+        return;
+      }
+
+      btnLogin.disabled = true;
+      btnLogin.textContent = 'Signing in...';
+
+      try {
+        const response = await fetch(`${API_BASE}/auth/login`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({
+            email: emailInput.value.trim(),
+            password: passwordInput.value
+          })
+        });
+
+        const data = await response.json().catch(() => ({}));
+
+        if (!response.ok) {
+          throw new Error(data.message || 'Invalid email or password');
+        }
+
+        // Store the Auth Bearer Token and user info in localStorage
+        if (data.token || data.access_token) {
+          localStorage.setItem('auth_token', data.token || data.access_token);
+          if (data.user) {
+            localStorage.setItem('auth_user', JSON.stringify(data.user));
+          }
+
+          // Send admins to the dashboard, everyone else to the placeholder page
+          if (data.user && data.user.role === 'admin') {
+            window.location.href = 'index.html';
+          } else {
+            window.location.href = 'cashier.html';
+          }
+        } else {
+          throw new Error('No token returned from server.');
+        }
+
+      } catch (err) {
+        generalError.textContent = err.message;
+        generalError.classList.remove('hidden');
+      } finally {
+        btnLogin.disabled = false;
+        btnLogin.textContent = 'Sign In';
+      }
+    });
+  </script>
+</body>
+</html>

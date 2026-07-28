@@ -15,13 +15,5 @@ class CheckRole
      *
      * @param  Closure(Request): (Response)  $next
      */
-    public function handle(Request $request, Closure $next, $role): Response
-    {
-        //We need a Middleware to stop cashiers from accessing admin routes.
-                // Check if user is logged in and has the correct role
-        if (!$request->user() || $request->user()->role !== $role) {
-            return response()->json(['message' => 'Unauthorized. Admin access required.'], 403);
-        }
-        return $next($request);
-    }
+
 }

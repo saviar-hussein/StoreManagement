@@ -161,8 +161,18 @@
 
   <script>
     // 1. Auth Check: If token is missing, force redirect to login.html
-   // 1. Auth Check: If token is missing, force redirect to login.html
+ // 1. Auth Check: If token is missing, force redirect to login.html
     if (!localStorage.getItem('auth_token')) {
+      window.location.href = 'login.html';
+    }
+
+    // 1b. Role Check: only admins belong on this page
+    try {
+      const authedUser = JSON.parse(localStorage.getItem('auth_user') || '{}');
+      if (authedUser.role !== 'admin') {
+        window.location.href = 'cashier.html';
+      }
+    } catch (e) {
       window.location.href = 'login.html';
     }
 

@@ -59,12 +59,33 @@
             id="password" 
             type="password" 
             placeholder="••••••••" 
-            class="w-full pl-11 pr-4 py-3 rounded-2xl border border-pink-200 bg-white/80 focus:border-pink-500 focus:ring-4 focus:ring-pink-100 outline-none transition"
+            class="w-full pl-11 pr-11 py-3 rounded-2xl border border-pink-200 bg-white/80 focus:border-pink-500 focus:ring-4 focus:ring-pink-100 outline-none transition"
             required
           />
+          <!-- Lock Icon (Left) -->
           <svg class="w-5 h-5 text-pink-400 absolute left-4 top-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
           </svg>
+
+          <!-- Toggle Password Eye Button (Right) -->
+          <button 
+            type="button" 
+            id="toggle-password" 
+            class="absolute right-4 top-3.5 text-pink-400 hover:text-pink-600 focus:outline-none transition"
+            aria-label="Toggle password visibility"
+          >
+            <!-- Eye Open Icon -->
+            <svg id="eye-icon" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+            </svg>
+
+            <!-- Eye Off / Slash Icon (Hidden by default) -->
+            <svg id="eye-off-icon" class="w-5 h-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858-5.908a10.02 10.02 0 013.982-.822c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m-1.748 1.748a3 3 0 11-4.243-4.243" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3l18 18" />
+            </svg>
+          </button>
         </div>
         <p id="password-error" class="hidden text-xs text-red-500 font-medium mt-1.5 flex items-center gap-1">
           <span>⚠️ Password is required</span>
@@ -89,15 +110,32 @@
   <script>
     const API_BASE = 'http://127.0.0.1:8000/api';
 
-    // If user is already logged in, send them straight to categories
+    // Password Toggle Feature
+    const passwordInput = document.getElementById('password');
+    const togglePasswordBtn = document.getElementById('toggle-password');
+    const eyeIcon = document.getElementById('eye-icon');
+    const eyeOffIcon = document.getElementById('eye-off-icon');
+
+    togglePasswordBtn.addEventListener('click', () => {
+      const isPassword = passwordInput.type === 'password';
+      passwordInput.type = isPassword ? 'text' : 'password';
+      eyeIcon.classList.toggle('hidden', isPassword);
+      eyeOffIcon.classList.toggle('hidden', !isPassword);
+    });
+
+    // If user is already logged in, send them to the right page for their role
     if (localStorage.getItem('auth_token')) {
-      window.location.href = 'index.html';
+      try {
+        const existingUser = JSON.parse(localStorage.getItem('auth_user') || '{}');
+        window.location.href = existingUser.role === 'admin' ? 'index.html' : 'cashier.html';
+      } catch (e) {
+        window.location.href = 'cashier.html';
+      }
     }
 
     const loginForm = document.getElementById('login-form');
     const emailInput = document.getElementById('email');
     const emailError = document.getElementById('email-error');
-    const passwordInput = document.getElementById('password');
     const passwordError = document.getElementById('password-error');
     const generalError = document.getElementById('general-error');
     const btnLogin = document.getElementById('btn-login');
@@ -174,13 +212,20 @@
         if (!response.ok) {
           throw new Error(data.message || 'Invalid email or password');
         }
-// Store the Auth Bearer Token and user info in localStorage
+
+        // Store the Auth Bearer Token and user info in localStorage
         if (data.token || data.access_token) {
           localStorage.setItem('auth_token', data.token || data.access_token);
           if (data.user) {
             localStorage.setItem('auth_user', JSON.stringify(data.user));
           }
-          window.location.href = 'index.html';
+
+          // Send admins to the dashboard, everyone else to the placeholder page
+          if (data.user && data.user.role === 'admin') {
+            window.location.href = 'index.html';
+          } else {
+            window.location.href = 'cashier.html';
+          }
         } else {
           throw new Error('No token returned from server.');
         }

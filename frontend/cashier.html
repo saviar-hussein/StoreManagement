@@ -32,7 +32,7 @@
   </div>
 
   <script>
-    // Auth check: if not logged in, send back to login
+    //  if not logged in, send back to login
     if (!localStorage.getItem('auth_token')) {
       window.location.href = 'login.html';
     }
@@ -44,7 +44,7 @@
         document.getElementById('welcome-text').textContent = `Welcome, ${user.name}`;
       }
     } catch (e) {
-      // No stored user info — keep the generic greeting.
+      // If there's an error parsing the user object, keep the generic greeting.
     }
 
     document.getElementById('btn-logout').addEventListener('click', () => {

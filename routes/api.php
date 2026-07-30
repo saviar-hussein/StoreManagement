@@ -28,6 +28,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/categories/{id}', [CategoryController::class, 'show']);
     
     // MODIFY: Admin ONLY (enforced by 'role:admin' middleware)
+    //admin acheta naw middleware y role
     Route::middleware('role:admin')->group(function () {
         Route::post('/categories', [CategoryController::class, 'store']);
         Route::put('/categories/{id}', [CategoryController::class, 'update']);
@@ -37,6 +38,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // DASHBOARD ROUTES
     // Admin ONLY
+    //role is the name of the CheckRole middleware
     Route::middleware('role:admin')->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'index']);
     });

@@ -17,20 +17,27 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-    // 1. Create Admin
-    User::create([
-        'name' => 'rozha Admin',
-        'email' => 'admin@store.com',
-        'password' => Hash::make('password123'), // BCrypt hashing
-        'role' => 'admin',
-    ]);
+    // // 1. Create Admin
+    // User::create([
+    //     'name' => 'rozha Admin',
+    //     'email' => 'admin@store.com',
+    //     'password' => Hash::make('password123'), // BCrypt hashing
+    //     'role' => 'admin',
+    // ]);
 
-    // 2. Create Cashier
-    User::create([
-        'name' => 'rozha Cashier',
-        'email' => 'cashier@store.com',
-        'password' => Hash::make('password123'),
-        'role' => 'cashier',
-    ]);
+    // // 2. Create Cashier
+    // User::create([
+    //     'name' => 'rozha Cashier',
+    //     'email' => 'cashier@store.com',
+    //     'password' => Hash::make('password123'),
+    //     'role' => 'cashier',
+    // ]);
+
+    //     User::create([
+    //     'name' => 'shakar',
+    //     'email' => 'shakar@store.com',
+    //     'password' => Hash::make('password123'),
+    //     'role' => 'cashier',
+    // ]);
     }
 }

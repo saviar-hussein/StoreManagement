@@ -12,30 +12,36 @@ use Illuminate\Validation\ValidationException;
 class AuthController extends Controller
 {
     public function login(Request $request)
-    {
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required|string',
-        ]);
+{
+    
+    $request->validate([
+        'email' => 'required|email',
+        'password' => 'required',
+        'remember' => 'sometimes|boolean', 
+    ]);
 
-        $user=user::where('email', $request->email)->first();
+  
+    $user = User::where('email', $request->email)->first();
 
-        if(!$user || !Hash::check($request->password, $user->password)){
-             return response()->json([
+    if (!$user || !Hash::check($request->password, $user->password)) {
+        return response()->json([
             'success' => false,
             'message' => 'Invalid credentials'
         ], 401);
-        }
+    }
 
+    $expiration = $request->boolean('remember') ? now()->addDays(30) : now()->addHours(24);
 
-        $token = $user->createToken('api-token')->plainTextToken;
+    $token = $user->createToken('api-token', ['*'], $expiration)->plainTextToken;
 
+    
     return response()->json([
         'success' => true,
         'user' => $user,
         'token' => $token,
+        'expires_in' => $request->boolean('remember') ? '30 days' : '24 hours'
     ], 200);
-    }
+}
 
             // Delete the current token
     public function logout(Request $request)

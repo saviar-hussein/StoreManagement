@@ -92,6 +92,18 @@
         </p>
       </div>
 
+      <!-- Remember Me -->
+      <div class="flex items-center justify-between -mt-1">
+        <label for="remember-me" class="flex items-center gap-2 cursor-pointer select-none">
+          <input
+            id="remember-me"
+            type="checkbox"
+            class="w-4 h-4 rounded border-pink-300 text-pink-500 focus:ring-pink-300 focus:ring-offset-0 cursor-pointer"
+          />
+          <span class="text-sm text-gray-600 font-medium">Remember me</span>
+        </label>
+      </div>
+
       <!-- General Server Error Message -->
       <div id="general-error" class="hidden p-3 rounded-xl bg-red-50 border border-red-200 text-xs text-red-600 font-semibold text-center"></div>
 
@@ -123,15 +135,30 @@
       eyeOffIcon.classList.toggle('hidden', !isPassword);
     });
 
+    // Auth is stored in localStorage when "Remember me" is checked (persists
+    // across browser restarts) or sessionStorage when it isn't (cleared as
+    // soon as the tab/browser closes). These helpers check/write both so the
+    // rest of the app doesn't need to care which one was used.
+    function getAuthToken() {
+      return localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token');
+    }
+    function getAuthUser() {
+      return localStorage.getItem('auth_user') || sessionStorage.getItem('auth_user');
+    }
+
     // If user is already logged in, send them to the right page for their role
-    if (localStorage.getItem('auth_token')) {
+    if (getAuthToken()) {
       try {
-        const existingUser = JSON.parse(localStorage.getItem('auth_user') || '{}');
+        const existingUser = JSON.parse(getAuthUser() || '{}');
         window.location.href = existingUser.role === 'admin' ? 'index.html' : 'cashier.html';
       } catch (e) {
         window.location.href = 'cashier.html';
       }
     }
+
+    // Must match the 'expiration' value (in minutes) set in config/sanctum.php.
+    // If you change it there, change it here too.
+    const TOKEN_LIFETIME_MINUTES = 2;
 
     const loginForm = document.getElementById('login-form');
     const emailInput = document.getElementById('email');
@@ -139,6 +166,7 @@
     const passwordError = document.getElementById('password-error');
     const generalError = document.getElementById('general-error');
     const btnLogin = document.getElementById('btn-login');
+    const rememberMeInput = document.getElementById('remember-me');
 
     // Strict Email Regex: requires characters before @, domain name, and TLD suffix
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -213,12 +241,19 @@
           throw new Error(data.message || 'Invalid email or password');
         }
 
-        // Store the Auth Bearer Token and user info in localStorage
+        // Store the Auth Bearer Token and user info.
+        // Checked  -> localStorage:  survives closing the browser/tab.
+        // Unchecked -> sessionStorage: cleared once the tab/browser closes.
         if (data.token || data.access_token) {
-          localStorage.setItem('auth_token', data.token || data.access_token);
+          const storage = rememberMeInput.checked ? localStorage : sessionStorage;
+          storage.setItem('auth_token', data.token || data.access_token);
           if (data.user) {
-            localStorage.setItem('auth_user', JSON.stringify(data.user));
+            storage.setItem('auth_user', JSON.stringify(data.user));
           }
+          // Record when this token will expire so other pages can auto-redirect
+          // to login the moment it does, instead of waiting for a failed API call.
+          const expiresAt = Date.now() + TOKEN_LIFETIME_MINUTES * 60 * 1000;
+          storage.setItem('auth_expires_at', String(expiresAt));
 
           // Send admins to the dashboard, everyone else to the placeholder page
           if (data.user && data.user.role === 'admin') {

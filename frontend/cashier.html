@@ -32,24 +32,62 @@
   </div>
 
   <script>
-    //  if not logged in, send back to login
-    if (!localStorage.getItem('auth_token')) {
+    // Auth may live in localStorage ("Remember me" checked at login) or
+    // sessionStorage (unchecked). Check both so it doesn't matter which.
+    function getAuthToken() {
+      return localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token');
+    }
+    function getAuthUser() {
+      return localStorage.getItem('auth_user') || sessionStorage.getItem('auth_user');
+    }
+    function getAuthExpiresAt() {
+      const raw = localStorage.getItem('auth_expires_at') || sessionStorage.getItem('auth_expires_at');
+      return raw ? Number(raw) : null;
+    }
+    function clearAuth() {
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('auth_user');
+      localStorage.removeItem('auth_expires_at');
+      sessionStorage.removeItem('auth_token');
+      sessionStorage.removeItem('auth_user');
+      sessionStorage.removeItem('auth_expires_at');
+    }
+
+    // Auth check: if not logged in, send back to login
+    if (!getAuthToken()) {
       window.location.href = 'login.html';
     }
 
+    // Auto-redirect to login the moment the token expires, instead of only
+    // catching it on the next button click / API call.
+    (function scheduleAuthExpiry() {
+      const expiresAt = getAuthExpiresAt();
+      if (!expiresAt) return;
+
+      const msRemaining = expiresAt - Date.now();
+      if (msRemaining <= 0) {
+        clearAuth();
+        window.location.href = 'login.html';
+        return;
+      }
+      setTimeout(() => {
+        clearAuth();
+        window.location.href = 'login.html';
+      }, msRemaining);
+    })();
+
     // Personalize the greeting with the cashier's name, if available
     try {
-      const user = JSON.parse(localStorage.getItem('auth_user') || '{}');
+      const user = JSON.parse(getAuthUser() || '{}');
       if (user.name) {
         document.getElementById('welcome-text').textContent = `Welcome, ${user.name}`;
       }
     } catch (e) {
-      // If there's an error parsing the user object, keep the generic greeting.
+      // No stored user info — keep the generic greeting.
     }
 
     document.getElementById('btn-logout').addEventListener('click', () => {
-      localStorage.removeItem('auth_token');
-      localStorage.removeItem('auth_user');
+      clearAuth();
       window.location.href = 'login.html';
     });
   </script>

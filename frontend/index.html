@@ -159,16 +159,58 @@
     <div id="toast-inner" class="px-5 py-4 rounded-2xl text-sm font-semibold shadow-2xl"></div>
   </div>
 
+
   <script>
+    // Auth may live in localStorage ("Remember me" checked at login) or
+    // sessionStorage (unchecked, cleared when the browser/tab closes).
+    // These helpers check both so it doesn't matter which one was used.
+    function getAuthToken() {
+      return localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token');
+    }
+    function getAuthUser() {
+      return localStorage.getItem('auth_user') || sessionStorage.getItem('auth_user');
+    }
+    function getAuthExpiresAt() {
+      const raw = localStorage.getItem('auth_expires_at') || sessionStorage.getItem('auth_expires_at');
+      return raw ? Number(raw) : null;
+    }
+    function clearAuth() {
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('auth_user');
+      localStorage.removeItem('auth_expires_at');
+      sessionStorage.removeItem('auth_token');
+      sessionStorage.removeItem('auth_user');
+      sessionStorage.removeItem('auth_expires_at');
+    }
+
     // 1. Auth Check: If token is missing, force redirect to login.html
- // 1. Auth Check: If token is missing, force redirect to login.html
-    if (!localStorage.getItem('auth_token')) {
+    if (!getAuthToken()) {
       window.location.href = 'login.html';
     }
 
+    // 2. Expiry check: if the token has already expired (e.g. this tab was
+    // left open past the 2-minute window), bounce straight to login.
+    // Otherwise, schedule an automatic redirect for the exact moment it expires,
+    // so the user doesn't have to click something first to discover they're logged out.
+    (function scheduleAuthExpiry() {
+      const expiresAt = getAuthExpiresAt();
+      if (!expiresAt) return; // no expiry info stored (older session) — rely on 401 handling only
+
+      const msRemaining = expiresAt - Date.now();
+      if (msRemaining <= 0) {
+        clearAuth();
+        window.location.href = 'login.html';
+        return;
+      }
+      setTimeout(() => {
+        clearAuth();
+        window.location.href = 'login.html';
+      }, msRemaining);
+    })();
+
     // 1b. Role Check: only admins belong on this page
     try {
-      const authedUser = JSON.parse(localStorage.getItem('auth_user') || '{}');
+      const authedUser = JSON.parse(getAuthUser() || '{}');
       if (authedUser.role !== 'admin') {
         window.location.href = 'cashier.html';
       }
@@ -178,7 +220,7 @@
 
     // Display the logged-in user's name and role in the header
     (function renderUserInfo() {
-      const raw = localStorage.getItem('auth_user');
+      const raw = getAuthUser();
       if (!raw) return;
 
       try {
@@ -202,7 +244,7 @@
     // Helper: only admins can create/edit/delete categories
     function isAdmin() {
       try {
-        const user = JSON.parse(localStorage.getItem('auth_user') || '{}');
+        const user = JSON.parse(getAuthUser() || '{}');
         return user.role === 'admin';
       } catch (e) {
         return false;
@@ -280,7 +322,7 @@
 
     // Updated API Helper that attaches Bearer Token
     async function apiCall(endpoint, method = 'GET', payload = null) {
-      const token = localStorage.getItem('auth_token');
+      const token = getAuthToken();
 
       const options = { 
         method, 
@@ -299,7 +341,7 @@
 
       // Handles expired / invalid session tokens
       if (res.status === 401) {
-        localStorage.removeItem('auth_token');
+        clearAuth();
         window.location.href = 'login.html';
         return;
       }

@@ -30,7 +30,7 @@ class AuthController extends Controller
         ], 401);
     }
 
-    $expiration = $request->boolean('remember') ? now()->addDays(30) : now()->addHours(24);
+    $expiration = $request->boolean('remember') ? now()->addDays(30) : now()->addMinutes(1);
 
     $token = $user->createToken('api-token', ['*'], $expiration)->plainTextToken;
 

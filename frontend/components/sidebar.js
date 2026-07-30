@@ -47,8 +47,14 @@ class AppSidebar extends HTMLElement {
 
   // Wire up the logout button: clear the saved token/user and go back to login.
     this.querySelector('#sidebar-logout-btn').addEventListener('click', () => {
+      // Clear both storages: the user may have logged in with or without
+      // "Remember me", so the token could be in either one.
       localStorage.removeItem('auth_token');
       localStorage.removeItem('auth_user');
+      localStorage.removeItem('auth_expires_at');
+      sessionStorage.removeItem('auth_token');
+      sessionStorage.removeItem('auth_user');
+      sessionStorage.removeItem('auth_expires_at');
       window.location.href = './login.html';
     });
   }

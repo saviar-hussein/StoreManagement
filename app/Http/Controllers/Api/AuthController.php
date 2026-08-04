@@ -7,8 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Validation\ValidationException;
+
 class AuthController extends Controller
 {
     public function login(Request $request)
@@ -30,7 +29,7 @@ class AuthController extends Controller
         ], 401);
     }
 
-    $expiration = $request->boolean('remember') ? now()->addDays(30) : now()->addMinutes(1);
+    $expiration = $request->boolean('remember') ? now()->addDays(30) : now()->addHours(24);
 
     $token = $user->createToken('api-token', ['*'], $expiration)->plainTextToken;
 

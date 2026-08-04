@@ -14,8 +14,8 @@ class UpdateCategoryRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255|unique:categories,name,' . $this->route('id'),
-            'description' => 'nullable|string|max:1000',
+            'name' => 'required|string|max:50|unique:categories,name,' . $this->route('id'),
+            'description' => 'nullable|string|max:500',
         ];
     }
 
@@ -26,4 +26,6 @@ class UpdateCategoryRequest extends FormRequest
             'name.unique' => 'This category name already exists',
         ];
     }
+
+    
 }

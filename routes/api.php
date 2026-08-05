@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\DashboardController;
+use App\Http\Controllers\Api\ProductController;
 use Illuminate\Support\Facades\Route;
 
 // ==========================================
@@ -21,6 +22,10 @@ Route::middleware('auth:sanctum')->group(function () {
     // Logout
     Route::post('/auth/logout', [AuthController::class, 'logout']);
 
+        // READ: Both Admin and Cashier can view products (needed for POS)
+    Route::get('/products', [ProductController::class, 'index']);
+    Route::get('/products/{id}', [ProductController::class, 'show']);
+
 
     // CATEGORY ROUTES
     // READ: Both Admin and Cashier can view categories
@@ -33,6 +38,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/categories', [CategoryController::class, 'store']);
         Route::put('/categories/{id}', [CategoryController::class, 'update']);
         Route::delete('/categories/{id}', [CategoryController::class, 'destroy']);
+
+        Route::post('/products', [ProductController::class, 'store']);
+        Route::put('/products/{id}', [ProductController::class, 'update']);
+        Route::delete('/products/{id}', [ProductController::class, 'destroy']);
     });
 
 
@@ -40,6 +49,8 @@ Route::middleware('auth:sanctum')->group(function () {
     // Admin ONLY
     //role is the name of the CheckRole middleware
     Route::middleware('role:admin')->group(function () {
-        Route::get('/dashboard', [DashboardController::class, 'index']);
+    Route::get('/dashboard', [DashboardController::class, 'index']);
+    
     });
+
 });

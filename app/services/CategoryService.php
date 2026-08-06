@@ -13,7 +13,6 @@ class CategoryService
       //$search receives the value passed from the CategoryController.
     public function getAllCategories(?string $search = null)
     {
-
         $query = Category::query();
         if($search) {
             $query->where('name', 'like', "%{$search}%");

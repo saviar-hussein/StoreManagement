@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreProductRequest;
 use App\Services\ProductService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
@@ -17,13 +18,21 @@ class ProductController extends Controller
         $this->productService = $productService;
     }
 
-    public function index(): JsonResponse
-    {
-        return response()->json([
-            'success' => true,
-            'data' => $this->productService->getAll()
-        ], 200);
+public function index(Request $request): JsonResponse
+{
+    // Check if the frontend sent a ?search= parameter
+    if ($request->has('search') && !empty($request->search)) {
+        $products = $this->productService->search($request->search);
+    } else {
+        // Otherwise, just get all products
+        $products = $this->productService->getAll();
     }
+
+    return response()->json([
+        'success' => true,
+        'data' => $products
+    ], 200);
+}
 
     public function show(int $id): JsonResponse
     {

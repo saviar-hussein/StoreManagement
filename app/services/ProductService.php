@@ -10,10 +10,28 @@ class ProductService
     // Get all products (with their category name)
     public function getAll()
     {
+
         // Eager loading the category prevents the N+1 query problem
         return Product::with('category')->orderBy('created_at', 'desc')->get();
     }
 
+
+public function search(?string $search = null)
+{
+    // If no search term is provided, just return all products
+    if (empty($search)) {
+        return $this->getAll();
+    }
+
+    // Use a closure to group the OR conditions safely
+    return Product::where(function ($query) use ($search) {
+        $query->where('name', 'like', "%{$search}%")
+              ->orWhere('description', 'like', "%{$search}%");
+    })
+    ->with('category') // Eager load to prevent N+1
+    ->orderBy('created_at', 'desc')
+    ->get();
+}
     // Get a single product by ID
     public function getById(int $id)
     {

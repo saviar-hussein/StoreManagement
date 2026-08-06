@@ -241,11 +241,9 @@
           throw new Error(data.message || 'Invalid email or password');
         }
 
-        // Store the Auth Bearer Token and user info.
-        // Checked  -> localStorage:  survives closing the browser/tab.
-        // Unchecked -> sessionStorage: cleared once the tab/browser closes.
+       
         if (data.token || data.access_token) {
-          const storage = rememberMeInput.checked ? localStorage : sessionStorage;
+          const storage = rememberMeInput.checked ? localStorage : sessionStorage; //storing token either in session or local storage based on remember me checkbox
           storage.setItem('auth_token', data.token || data.access_token);
           if (data.user) {
             storage.setItem('auth_user', JSON.stringify(data.user));

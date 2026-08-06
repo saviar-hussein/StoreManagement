@@ -33,6 +33,7 @@ class ProductController extends Controller
         ], 200);
     }
 
+
     public function store(StoreProductRequest $request): JsonResponse
     {
         $product = $this->productService->create($request);

@@ -54,7 +54,7 @@
 
     <section class="p-4 sm:p-8">
       <!-- Stats & Controls Row -->
-      <div class="flex flex-col lg:flex-row items-stretch lg:items-center justify-between mb-6 sm:mb-8 gap-4">
+      <div class="flex flex-col lg:flex-row items-stretch lg:items-center justify-between mb-4 gap-4">
         
         <!-- Total Products Stat Card -->
         <div class="w-full lg:w-auto lg:min-w-[240px]">
@@ -96,6 +96,16 @@
         </div>
       </div>
 
+      <!-- Category Filter Buttons Bar (Heading text removed) -->
+      <div class="mb-6 sm:mb-8">
+        <div id="category-filters" class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+          <button onclick="filterCategory(null)" id="cat-pill-all" class="cat-pill px-4 py-2 rounded-2xl text-xs font-bold transition-all border bg-pink-500 text-white border-pink-500 shadow-md shrink-0">
+            All Products
+          </button>
+          <!-- Dynamic category pills inserted here -->
+        </div>
+      </div>
+
       <!-- Card View Container -->
       <div id="card-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <!-- Dynamic Cards Inject Here -->
@@ -112,8 +122,8 @@
           <svg class="w-10 h-10 sm:w-12 sm:h-12 text-pink-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
         </div>
         <h3 class="text-xl sm:text-2xl font-bold text-gray-900 mb-2">No products found</h3>
-        <p class="text-gray-500 mb-6 text-sm sm:text-base">Try adjusting your search or add a new product.</p>
-        <button onclick="document.getElementById('btn-new').click()" class="bg-gradient-to-r from-pink-500 to-fuchsia-500 text-white px-6 py-3 rounded-2xl font-semibold shadow-lg hover:scale-105 transition">Create First Product</button>
+        <p class="text-gray-500 mb-6 text-sm sm:text-base">Try adjusting your search or category filter.</p>
+        <button onclick="document.getElementById('btn-new').click()" class="bg-gradient-to-r from-pink-500 to-fuchsia-500 text-white px-6 py-3 rounded-2xl font-semibold shadow-lg hover:scale-105 transition">Create Product</button>
       </div>
 
       <!-- Error State UI -->
@@ -230,31 +240,30 @@
     const btnViewCard = document.getElementById('btn-view-card');
     const btnViewStack = document.getElementById('btn-view-stack');
     
-    // Set view mode default to 'card'
     let currentViewMode = 'card';
     let productsList = [];
+    let categoriesList = [];
+    let selectedCategoryId = null;
     let editingId = null;
     let pendingDeleteId = null;
     let pendingDeleteName = '';
-    let searchTimeout = null;
 
-    // View toggle event listeners
     btnViewCard.onclick = () => setViewMode('card');
     btnViewStack.onclick = () => setViewMode('stack');
 
     function setViewMode(mode) {
       currentViewMode = mode;
-      const activeBtnClasses = "flex-1 sm:flex-none px-5 py-2 rounded-xl text-sm font-bold bg-pink-500 text-white shadow-md transition-all duration-200";
-      const inactiveBtnClasses = "flex-1 sm:flex-none px-5 py-2 rounded-xl text-sm font-bold text-gray-600 hover:text-pink-500 transition-all duration-200";
+      const activeBtn = "flex-1 sm:flex-none px-5 py-2 rounded-xl text-sm font-bold bg-pink-500 text-white shadow-md transition-all duration-200";
+      const inactiveBtn = "flex-1 sm:flex-none px-5 py-2 rounded-xl text-sm font-bold text-gray-600 hover:text-pink-500 transition-all duration-200";
 
       if (mode === 'card') {
-        btnViewCard.className = activeBtnClasses;
-        btnViewStack.className = inactiveBtnClasses;
+        btnViewCard.className = activeBtn;
+        btnViewStack.className = inactiveBtn;
       } else {
-        btnViewStack.className = activeBtnClasses;
-        btnViewCard.className = inactiveBtnClasses;
+        btnViewStack.className = activeBtn;
+        btnViewCard.className = inactiveBtn;
       }
-      renderProducts(productsList);
+      applyFiltersAndRender();
     }
 
     document.getElementById('btn-toggle-sidebar').onclick = () => {
@@ -301,27 +310,76 @@
       return json;
     }
 
-    async function loadCategoryOptions() {
+    async function fetchCategories() {
       try {
         const json = await apiCall('/categories');
-        const categories = json.data || json;
+        categoriesList = json.data || json || [];
+        
+        // Render Category Filter Buttons
+        const filterContainer = document.getElementById('category-filters');
+        const pillHTML = categoriesList.map(c => `
+          <button 
+            onclick="filterCategory(${c.id})" 
+            id="cat-pill-${c.id}" 
+            class="cat-pill px-4 py-2 rounded-2xl text-xs font-bold transition-all border bg-white/80 text-gray-600 border-pink-100 hover:bg-pink-50 hover:text-pink-600 shrink-0"
+          >
+            ${escapeHtml(c.name)}
+          </button>
+        `).join('');
+
+        filterContainer.innerHTML = `
+          <button onclick="filterCategory(null)" id="cat-pill-all" class="cat-pill px-4 py-2 rounded-2xl text-xs font-bold transition-all border bg-pink-500 text-white border-pink-500 shadow-md shrink-0">
+            All Products
+          </button>
+        ` + pillHTML;
+
+        // Populate Modal Dropdown
         const select = document.getElementById('f-category');
-        select.innerHTML = '<option value="">Select a Category</option>' + categories.map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('');
+        select.innerHTML = '<option value="">Select a Category</option>' + categoriesList.map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('');
       } catch (e) {}
     }
 
-    async function fetchProducts(query = '') {
+    window.filterCategory = (catId) => {
+      selectedCategoryId = catId;
+
+      // Update active state on category buttons
+      document.querySelectorAll('.cat-pill').forEach(btn => {
+        btn.className = "cat-pill px-4 py-2 rounded-2xl text-xs font-bold transition-all border bg-white/80 text-gray-600 border-pink-100 hover:bg-pink-50 hover:text-pink-600 shrink-0";
+      });
+
+      const activePill = catId ? document.getElementById(`cat-pill-${catId}`) : document.getElementById('cat-pill-all');
+      if (activePill) {
+        activePill.className = "cat-pill px-4 py-2 rounded-2xl text-xs font-bold transition-all border bg-pink-500 text-white border-pink-500 shadow-md shrink-0";
+      }
+
+      applyFiltersAndRender();
+    };
+
+    async function fetchProducts() {
       try {
-        const endpoint = query ? `/products?search=${encodeURIComponent(query)}` : '/products';
-        const json = await apiCall(endpoint);
+        const json = await apiCall('/products');
         productsList = json.data || json || [];
-        renderProducts(productsList);
+        applyFiltersAndRender();
       } catch (err) {
         cardContainer.classList.add('hidden');
         stackContainer.classList.add('hidden');
         emptyState.classList.add('hidden');
         errorState.classList.remove('hidden');
       }
+    }
+
+    // Client-side search and category filtering logic
+    function applyFiltersAndRender() {
+      const searchTerm = searchInput.value.trim().toLowerCase();
+      
+      const filtered = productsList.filter(p => {
+        const matchesSearch = !searchTerm || p.name.toLowerCase().includes(searchTerm) || (p.category?.name || p.category_name || '').toLowerCase().includes(searchTerm);
+        const pCatId = p.category_id || p.category?.id;
+        const matchesCategory = selectedCategoryId === null || pCatId == selectedCategoryId;
+        return matchesSearch && matchesCategory;
+      });
+
+      renderProducts(filtered);
     }
 
     function renderProducts(products) {
@@ -404,13 +462,10 @@
       }
     }
 
-    searchInput.addEventListener('input', (e) => {
-      clearTimeout(searchTimeout);
-      searchTimeout = setTimeout(() => fetchProducts(e.target.value.trim()), 300);
-    });
+    // Instant search input listener
+    searchInput.addEventListener('input', applyFiltersAndRender);
 
-    async function openModal(prod = null) {
-      await loadCategoryOptions();
+    function openModal(prod = null) {
       editingId = prod ? prod.id : null;
       document.getElementById('modal-title').textContent = prod ? 'Edit Product' : 'Add Product';
       document.getElementById('f-name').value = prod ? prod.name : '';
@@ -420,7 +475,6 @@
       modal.classList.remove('hidden');
     }
 
-    // Exposed Edit Handler
     window.editProduct = (prodData) => {
       const prod = typeof prodData === 'string' ? JSON.parse(prodData) : prodData;
       openModal(prod);
@@ -432,7 +486,6 @@
     document.getElementById('btn-cancel-top').onclick = closeModal;
     modal.onclick = e => { if (e.target === modal) closeModal(); };
 
-    // Delete Modal Handlers
     window.deleteProduct = (id, name) => {
       pendingDeleteId = id;
       pendingDeleteName = name;
@@ -458,7 +511,7 @@
       try {
         await apiCall(`/products/${targetId}`, 'DELETE');
         showToast(`"${targetName}" deleted successfully`);
-        fetchProducts(searchInput.value.trim());
+        fetchProducts();
       } catch (err) {
         showToast(err.message, 'error');
       }
@@ -483,7 +536,7 @@
           showToast('Product created successfully');
         }
         closeModal();
-        fetchProducts(searchInput.value.trim());
+        fetchProducts();
       } catch (err) {
         showToast(err.message, 'error');
       } finally {
@@ -491,6 +544,8 @@
       }
     };
 
+    // Initialize Page Data
+    fetchCategories();
     fetchProducts();
   </script>
 </body>
